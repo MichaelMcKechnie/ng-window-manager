@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * @ngdoc directive
  * @name ngWindowManager.directive:wmwindow
@@ -7,9 +5,10 @@
  * # wmWindow
  */
 
-angular.module('ngWindowManager',[])
-.directive('wmwindow', function () {
-	return {
+window.angular.module('ngWindowManager',[])
+.directive('wmwindow', ['$window', function($window) {
+    'use strict';
+    return {
 		template: '<div class="wmWindow">'+
 					'<div class="wmWindowBox">'+
 						'<div class="wmTitleBar">' +
@@ -28,15 +27,15 @@ angular.module('ngWindowManager',[])
 		replace: true,
 		transclude: true,
 		scope: {
-			title: '@',
+			title: '=',
 			close: '=',
 			open: '=',
 			selectwindow: '=',
 			maximize: '=',
 			restore: '=',
-			options: '@',
-			maximizable: '@',
-			closeable: '@',
+			options: '=',
+			maximizable: '=',
+			closeable: '='
 		},
 		link: function (scope, element) {
 			
@@ -60,14 +59,14 @@ angular.module('ngWindowManager',[])
 			winHandler.elem = element;
 			
 			//Parse the options
-			var options = scope.options ? JSON.parse(scope.options) :{};
+			var options = scope.options ? scope.options : {};
 	
 			//If it's defined a windowContainer zone we will use it to bind 
 			//all the listeners, that way we can fit windows under an element but move in other 
-			var windowArea = options.windowContainer===undefined ? parentWindow : document.getElementById(options.windowContainer);
+			var windowArea = options.windowContainer===undefined ? parentWindow : $window.document.getElementById(options.windowContainer);
 		
 			//Set some tricky controls to handle the layering
-			parentWindow.topZ = parentWindow.topZ || options.initialZIndex || angular.element(parentWindow).css('z-index') || 100000;
+			parentWindow.topZ = parentWindow.topZ || options.initialZIndex || $window.angular.element(parentWindow).css('z-index') || 100000;
 			
 			//This function is executed when close button is pushed
 			winHandler.close = function (){
@@ -239,7 +238,7 @@ angular.module('ngWindowManager',[])
 			
 			winHandler.getMaximizeToElement = function() {
 				if (options.maximizeTo!=='window'){
-					var elementToMaximize = document.getElementById (options.maximizeTo) || document.getElementsByTagName (options.maximizeTo);
+					var elementToMaximize = $window.document.getElementById (options.maximizeTo) || $window.document.getElementsByTagName (options.maximizeTo);
 					return options.maximizeTo ? (elementToMaximize) : windowArea;
 				}
 				return window;
@@ -394,4 +393,4 @@ angular.module('ngWindowManager',[])
 			},50);
 		}
 	};
-});
+}]);
